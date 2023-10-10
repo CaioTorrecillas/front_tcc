@@ -1,0 +1,159 @@
+import React, { Component } from 'react';
+import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Dimensions, TextInput } from 'react-native';
+
+import * as Animatable from 'react-native-animatable'
+
+const windowHeight = Dimensions.get('window').height;
+
+class LoginScreen extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: '',
+      password: '',
+    };
+  }
+}
+
+handleLogin = () => {
+    const { username, password } = this.state;
+
+    if (username === 'usuario' && password === 'senha') {
+      alert('Login bem-sucedido!');
+    } else {
+      alert('Login falhou. Verifique seu nome de usuário e senha.');
+    }
+  }
+
+
+export default function Welcome() {
+    
+
+  return (
+    <View style={styles.container}>
+        <StatusBar backgroundColor= "white" barStyle="light-content"/>
+
+        <View style={styles.containerLogo}>
+            
+        <Animatable.Image
+        animation='flipInY'
+        source={require('../../assets/logo.png')}
+        style={{width: '100%', height: 415, borderRadius: 100}}
+        resizemode="contain"/>
+        
+        </View>
+        
+        <Animatable.View delay={600} animation='fadeInUp' style={styles.containerForm}>
+        <View style={styles.containerForm}>
+        <Text style={styles.blind}>Blind Transport</Text>
+        <Text style={styles.tittle}>O aplicativo de locomação para todos!!</Text>
+        <Text style={styles.title}>Faça o seu Login</Text>
+        <TextInput
+          style={styles.txt}
+          placeholder="Nome de Usuário"
+          onChangeText={(username) => this.setState({ username })}
+        />
+        <TextInput
+          style={styles.txt}
+          placeholder="Senha"
+          secureTextEntry={true}
+          onChangeText={(password) => this.setState({ password })}
+        />
+
+        <TouchableOpacity 
+        style={styles.button}
+        >
+            <Text style={styles.buttonText}>Acessar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+        style={styles.buttonReg}
+        >
+            <Text style={styles.buttonText}>Registre-se</Text>
+        </TouchableOpacity>
+        </View>
+        </Animatable.View>
+    </View>
+        
+
+  );
+}
+    const styles = StyleSheet.create({
+        container:{
+            flex:1,
+            backgroundColor: 'white'
+        },
+        containerLogo:{
+            flex:2,
+            backgroundColor: 'white',
+            justifyContent:'center',
+            alignItems:'center'
+        },
+        containerForm:{
+            flex:3, 
+            backgroundColor: '#FFF',
+            paddingStart: '5%',
+            paddingEnd: '5%'
+        },
+        tittle:{
+            fontSize: 20,
+            fontWeight: 'bold',
+            marginTop: 10,
+            marginBottom: 12,
+            color: 'black',
+            alignItems:'center',
+            alignSelf: 'center'
+        },
+        text:{
+            color: 'black',
+            alignItems:'center',
+            alignSelf: 'center',
+            marginTop: 220,
+        },
+        button:{
+            position: 'absolute',
+            backgroundColor: 'black',
+            borderRadius: 50,
+            paddingVertical: 8,
+            width: '60%',
+            alignSelf: 'center',
+            bottom:'15%',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 50
+        },
+        buttonText:{
+            fontSize: 18,
+            color: '#FFF'
+        },
+        blind:{
+          fontSize: 30,
+            fontWeight: 'bold',
+            marginTop: 28,
+            marginBottom: 12,
+            color: 'black',
+            alignItems:'center',
+            alignSelf: 'center'
+        },
+        txt:{
+            borderWidth: 1,
+            borderColor:'black',
+            borderStyle: 'solid',
+            marginTop:15
+        },
+        title: {
+            fontSize: 18,
+            color: 'black',
+            marginTop:20,
+        },
+        buttonReg:{
+          position: 'absolute',
+          backgroundColor: 'black',
+          borderRadius: 50,
+          paddingVertical: 8,
+          width: '60%',
+          alignSelf: 'center',
+          bottom:'15%',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }
+    })
