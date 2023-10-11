@@ -62,7 +62,7 @@ class CadastroScreen extends Component {
             onChangeText={(cpf) => this.setState({ cpf })}/>
         <TextInput
             style={styles.input}
-            placeholder='Data de nascimento'
+            placeholder='Idade'
             onChangeText={(dataNascimento) => this.setState({ dataNascimento })}/>
 
         <TouchableOpacity style={styles.buttonCad}>
@@ -110,13 +110,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   img:{
-    width: '100%',
-    height: 350,
+    width: 100,
+    height: 100,
     borderRadius: 10,
     alignItems: 'center',
-    justifyContent: 'flex-start'
+    justifyContent: 'flex-start',
+    marginTop: -100,
 
   }
+ 
 });
 
 export default CadastroScreen;

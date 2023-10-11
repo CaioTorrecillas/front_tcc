@@ -6,7 +6,7 @@ import * as Animatable from 'react-native-animatable'
 
 
 
-export default function Welcome() {
+const WelcomePCD = () =>{
     
 
   return (
@@ -22,6 +22,11 @@ export default function Welcome() {
         resizemode="contain"/>
         
         </View>
+        
+        <Animatable.View delay={600} animation='fadeInUp' style={styles.containerForm}>
+        <View style={styles.containerForm}>
+        <Text style={styles.blind}>Usuario PCD</Text>
+    
         <TextInput
           style={styles.input}
           placeholder="Onde esta? "
@@ -31,15 +36,15 @@ export default function Welcome() {
           style={styles.input}
           placeholder="Onde vamos? "
         />
-        <Animatable.View delay={600} animation='fadeInUp' style={styles.containerForm}>
-        <View style={styles.containerForm}>
-        <Text style={styles.blind}>Blinder</Text>
-    
-
         <TouchableOpacity 
-        style={styles.button}
+        style={styles.button1}
         >
-            <Text style={styles.buttonText}>Acessar</Text>
+            <Text style={styles.buttonText}>Ver Jornadas</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+        style={styles.button2}
+        >
+            <Text style={styles.buttonText}>Mandar Jornada</Text>
         </TouchableOpacity>
         </View>
         </Animatable.View>
@@ -80,7 +85,7 @@ export default function Welcome() {
             alignSelf: 'center',
             marginTop: 220,
         },
-        button:{
+        button1:{
             position: 'absolute',
             backgroundColor: 'black',
             borderRadius: 50,
@@ -91,6 +96,17 @@ export default function Welcome() {
             alignItems: 'center',
             justifyContent: 'center'
         },
+        button2:{
+          position: 'absolute',
+          backgroundColor: 'black',
+          borderRadius: 50,
+          paddingVertical: 8,
+          width: '60%',
+          alignSelf: 'center',
+          bottom:'5%',
+          alignItems: 'center',
+          justifyContent: 'center'
+      },
         buttonText:{
             fontSize: 18,
             color: '#FFF'
@@ -98,7 +114,7 @@ export default function Welcome() {
         blind:{
           fontSize: 30,
             fontWeight: 'bold',
-            marginTop: 28,
+            marginTop: 0,
             marginBottom: 12,
             color: 'black',
             alignItems:'center',
@@ -113,3 +129,4 @@ export default function Welcome() {
             paddingLeft: 8,
           },
     })
+export default WelcomePCD;

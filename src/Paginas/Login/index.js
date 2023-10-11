@@ -1,21 +1,39 @@
-import React, { useState } from 'react';
+import { React, useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { useNavigation } from '@react-navigation/native';
-
+import { useAuth } from '../../Autenticator/Autenticar'; // Importe useAuth
 const windowHeight = Dimensions.get('window').height;
 
+
+const data = { 
+    nomePCD: 'Usuario', 
+    senha: 'Senha', 
+    type: 'Aux' 
+};
+
+
 const LoginScreen = () => {
+    const {login } = useAuth();
     const navigation = useNavigation(); // Obtenha a função de navegação
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-
+    
+    
     const handleLogin = () => {
-        if (username === 'usuario' && password === 'senha') {
-            alert('Login bem-sucedido!');
-            //navigation.navigate('CadastroScreen'); // Navegue para a tela "Welcome"
+        if (username === data.nomePCD && password === data.senha) {
+           alert('Login bem-sucedido!');
+           if(data.type === 'PCD'){
+            navigation.navigate('WelcomePCD'); 
+           }else if(data.type === 'Aux'){
+            navigation.navigate('WelcomeAux'); 
+           }
+
+            
         } else {
-            alert('Login falhou. Verifique seu nome de usuário e senha.');
+
+           // alert('Login falhou. Verifique seu nome de usuário e senha.');
+ 
         }
     }
 
@@ -29,28 +47,26 @@ const LoginScreen = () => {
                 resizeMode="contain" />
 
             <Animatable.View delay={100} animation='fadeInUp' style={[styles.containerForm, { height: windowHeight / 3 }]}>
-                <Text style={styles.tit}>Blind Uber</Text>
-                <Text style={styles.title}>Faça o seu Login</Text>
+                <Text style={styles.title1}>Faça o seu Login</Text>
                 <TextInput
                     style={styles.txt}
                     placeholder="Nome de Usuário"
-                    onChangeText={(username) => this.setState({ username })}
+                    onChangeText={(username) => setUsername(username)}
                 />
                 <TextInput
                     style={styles.txt}
                     placeholder="Senha"
                     secureTextEntry={true}
-                    onChangeText={(password) => this.setState({ password })}
+                    onChangeText={(password) => setPassword(password)}
                 />
-                <View style={[styles.buttonContainer, { flex: 2 / 3 }]}>
+                <View style={[styles.buttonContainer, { flex: 3 / 3 }]}>
                     <TouchableOpacity 
                     style={styles.buttonEntrar}  
                     onPress={() => { 
-                        navigation.navigate('Welcome'); 
-                        this.handleLogin; }}>
+                        handleLogin();
+                        }}>
                         <Text style={styles.buttonTxt}>Entrar</Text>
                     </TouchableOpacity>
-
                     <TouchableOpacity  style={styles.buttonCadastro} onPress={() => { 
                         navigation.navigate('CadastroScreen'); 
                         this.handleLogin; }}>
@@ -89,7 +105,7 @@ const styles = StyleSheet.create({
     },
     buttonCadastro: {
         backgroundColor: 'black',
-        width: 250,
+        width: 120,
         height: 50,
         justifyContent: 'center',
         alignItems: 'center',
@@ -97,14 +113,29 @@ const styles = StyleSheet.create({
         marginTop: 10,
         borderRadius: 125,
     },
+    buttonContainer: {
+        flexDirection: 'row', // Define a direção como "row" para alinhar os botões horizontalmente
+        justifyContent: 'space-between', // Você pode ajustar isso conforme necessário
+        alignItems: 'center',
+    },
     buttonEntrar: {
         backgroundColor: 'black',
-        width: 250,
+        width: 100,
         height: 50,
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
-        marginTop: 70,
+        marginTop: 10,
+        borderRadius: 125,
+    },
+    buttonAux: {
+        backgroundColor: 'black',
+        width: 100,
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        marginTop: 10,
         borderRadius: 125,
     },
     buttonTxt: {
@@ -112,12 +143,9 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
-    buttonContainer: {
-        alignItems: 'center',
-    },
-    tit: {
+    title1: {
         fontSize: 30,
-        marginBottom: 16,
+        marginBottom: 60,
         textAlign: 'center',
         color: 'black'
     }
