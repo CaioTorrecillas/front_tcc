@@ -8,7 +8,7 @@ const windowHeight = Dimensions.get('window').height;
 
 const data = { 
     nomePCD: 'Usuario', 
-    senha: 'Senha', 
+    senha: '123', 
     type: 'Aux' 
 };
 
