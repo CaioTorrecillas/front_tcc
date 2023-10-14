@@ -1,75 +1,72 @@
-import React,  { useState } from 'react'
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native'
+import React from 'react';
+import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
+const JornadaCard = (props) => {
+    const navigation = useNavigation(); // Usando useNavigation
 
-const JornadaCard = ({ item }) => {
-    const [aceitou, setAceitou] = useState(false);
-
-    const handleAcao = () => {
-        setAceitou(true);
-        if(aceitou){
-            alert('Login bem-sucedido!')
-        }
+    const { data } = props;
+    console.log(data)
+    const navegarParaMapa = () => {
+        navigation.navigate('MapaAux', {jornadaData: data});
     }
 
     return (
-        <TouchableOpacity>
-            <Text
-                style={styles.usuarioPCDNome}
-                numberOfLines={1}>{item.nomePCD}</Text>
-            <View style={styles.infoContainer}>
-                <Text style={styles.origem}>
-                    {item.origem}
-                </Text>
-                <Text style={styles.destino}>
-                    {item.destino}
-                </Text>
-            </View>
-            <TouchableOpacity onPress={() => {
-                 handleAcao()
-                }}
-            style={styles.aceitarButton}>
-                <Text style={styles.buttonTxt}>Aceitar?</Text>
+        <TouchableOpacity style={styles.container}>
+            <Text>Jornada de {data.usuario.name}</Text>
+            <Text>Onde estou?: {data.cep_origem},{data.numero_origem} </Text>
+            <Text>Meu Destino: {data.cep_destino}, {data.numero_destino} </Text>
+            <Text style={styles.descricao}>
+                Mensagem do Pcd: {data.desc_pcd}
+            </Text>
+            <TouchableOpacity
+                onPress={navegarParaMapa}
+                style={styles.aceitarButton}>
+                <Text style={styles.buttonTxt}>Ver</Text>
+                
             </TouchableOpacity>
+            <TouchableOpacity
 
+                style={styles.aceitarButton}>
+                <Text style={styles.buttonTxt}>Aceitar?</Text>
+                
+            </TouchableOpacity>
         </TouchableOpacity>
-    )
+    );
 }
+
 
 const styles = StyleSheet.create({
 
-    container: {
-        flex: 1,
+    container:{
+        width: 250,
+        padding: 24,
+        borderRadius: 16,
+        borderColor:'black',
+        borderWidth: 2,
         justifyContent: "space-between",
-        alignItems: "center",
-        flexDirection: "row",
-        padding: 16,
-        borderRadius: 12,
-        backgroundColor: "#e387ed",
-        shadowColor: "#000",
-        justifyContent: "center", // Isso coloca os elementos à esquerda e à direita
-    
+        shadowColor: "#F3F4F8",
+      },
+    descricao: {
+        fontSize: 14,
+        flexWrap: 'wrap',
     },
-
     usuarioPCDNome: ({
         fontSize: 12,
         fontFamily: "DMRegular",
+        fontWeight: 'bold',
 
     }),
-    buttonTxt: {
-        color: 'white',
-        fontSize: 10,
-        fontWeight: 'bold',
-    },
+    searchBtn: {
+       
+      },
     aceitarButton: {
-        backgroundColor: 'green',
-        width: 50,
-        height: 20,
-        justifyContent: 'right',
-        alignItems: 'center',
-        borderWidth: 1,
-        marginTop: 10,
-        borderRadius: 50,
+        width: 70,
+        height: "15%",
+        backgroundColor: 'orange',
+        borderRadius: 10,
+        justifyContent: "center",
+        alignItems: "center",
     },
     infoContainer: {
         marginTop: 20,
@@ -86,4 +83,4 @@ const styles = StyleSheet.create({
     }
 
 });
-export default JornadaCard
+export default JornadaCard;

@@ -3,50 +3,83 @@ import { View, Text, TextInput, Button, StyleSheet, Image, TouchableOpacity, Dim
 import * as Animatable from 'react-native-animatable';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../Autenticator/Autenticar'; // Importe useAuth
+import * as Speech from 'expo-speech'
 const windowHeight = Dimensions.get('window').height;
-
-
-const data = { 
-    nomePCD: 'Usuario', 
-    senha: '123', 
-    type: 'Aux' 
-};
-
+import api, { loginUsuarioService } from '../../hook/api';
+import Voice from '@react-native-voice/voice'
 
 const LoginScreen = () => {
-    const {login } = useAuth();
-    const navigation = useNavigation(); // Obtenha a função de navegação
+    const usuarios = "usuarios"
+    const [endpoint, setEndpoint] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    
-    
-    const handleLogin = () => {
-        if (username === data.nomePCD && password === data.senha) {
-           alert('Login bem-sucedido!');
-           if(data.type === 'PCD'){
-            navigation.navigate('WelcomePCD'); 
-           }else if(data.type === 'Aux'){
-            navigation.navigate('WelcomeAux'); 
-           }
+    const [text, setText] = useState('Bem vindo Usuario. Caso voce tiver deficiencia visual esse aplicativo pode te ajudar');
+    const [spokenText, setSpokenText] = useState('');
 
+   
+    const navigation = useNavigation();
+    const fazerLogin = async () => {
+        loginUsuarioService(username, password)
+            .then(function (response) {
+                const status = response.status
+                const tipo = response.data.usuarioUnico.tipo
+                const id = response.data.usuarioUnico.id;
+                const name = response.data.usuarioUnico.name
+                const telefone = response.data.usuarioUnico.telefone
+                console.log(response.data.usuarioUnico.telefone)
+                console.log(id)
+                console.log(status)
+                console.log(tipo)
+                if (status == 200) {
+                    if (tipo == 'PCD' || tipo == 'Pcd') {
+                        navigation.navigate('WelcomePCD', {id, name, telefone});
+                    } else if (tipo == 'AUX' || tipo == 'Aux') {
+                        navigation.navigate('WelcomeAux', {name});
+                    }
+                    alert('Logado com sucesso');
+                }
+               
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+                 
             
-        } else {
+    }
+    /*
+    useEffect(() => {
+        api.get('List').then(({data}) => {
+            setAlgumacoisa(data)
+        })
 
-           // alert('Login falhou. Verifique seu nome de usuário e senha.');
- 
+    })
+    */
+    const buscarUsuarios = async () => {
+        try {
+            //resposta da api
+            setEndpoint("/usuarios")
+            const response = await api.get(`${endpoint}`)
+            console.log(response.data)
+        } catch (error) {
+            console.log(error)
         }
     }
+    /*function speak(){
+        Speech.speak(text, {
+            language: 'pt-BR'
+        })
+    }*/
+    function gravarVoz (){
+       Voice.start('pr-BR');
 
+    }
     return (
         <View style={styles.container}>
 
-            <Animatable.Image
+            <Animatable.View
+                delay={100}
                 animation='fadeInUp'
-
-                style={{ width: '100%', height: 394, }}
-                resizeMode="contain" />
-
-            <Animatable.View delay={100} animation='fadeInUp' style={[styles.containerForm, { height: windowHeight / 3 }]}>
+                style={[styles.containerForm, { height: windowHeight / 2  }]}>
                 <Text style={styles.title1}>Faça o seu Login</Text>
                 <TextInput
                     style={styles.txt}
@@ -60,16 +93,17 @@ const LoginScreen = () => {
                     onChangeText={(password) => setPassword(password)}
                 />
                 <View style={[styles.buttonContainer, { flex: 3 / 3 }]}>
-                    <TouchableOpacity 
-                    style={styles.buttonEntrar}  
-                    onPress={() => { 
-                        handleLogin();
+                    <TouchableOpacity
+                        style={styles.buttonEntrar}
+                        onPress={() => {
+                            fazerLogin();
                         }}>
                         <Text style={styles.buttonTxt}>Entrar</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity  style={styles.buttonCadastro} onPress={() => { 
-                        navigation.navigate('CadastroScreen'); 
-                        this.handleLogin; }}>
+                    <TouchableOpacity style={styles.buttonCadastro} onPress={() => {
+                        navigation.navigate('CadastroScreen');
+                        this.handleLogin;
+                    }}>
                         <Text style={styles.buttonTxt}>Registrar-se</Text>
                     </TouchableOpacity>
                 </View>
@@ -88,21 +122,23 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        backgroundColor: 'black'
+        backgroundColor: 'white',
     },
     containerForm: {
         flex: 1,
         backgroundColor: '#FFF',
         paddingStart: '5%',
-        paddingEnd: '5%'
+        paddingEnd: '5%',
+        marginTop: 100
 
     },
     txt: {
         borderWidth: 1,
         borderColor: 'black',
-        borderStyle: 'solid',
-        marginTop: 15
-    },
+        borderRadius: 10,
+        padding: 10, 
+        marginTop: 15,
+      },
     buttonCadastro: {
         backgroundColor: 'black',
         width: 120,
@@ -114,8 +150,8 @@ const styles = StyleSheet.create({
         borderRadius: 125,
     },
     buttonContainer: {
-        flexDirection: 'row', // Define a direção como "row" para alinhar os botões horizontalmente
-        justifyContent: 'space-between', // Você pode ajustar isso conforme necessário
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
     },
     buttonEntrar: {

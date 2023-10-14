@@ -1,55 +1,93 @@
-import React from 'react';
+import React, { Component, useEffect, useState } from 'react';
 import { View, Text, StatusBar, StyleSheet, Image, TextInput, TouchableOpacity, FlatList } from 'react-native';
-import JornadaCard from '../../common/jornadaCard';
+import JornadaCard from '../../common/jornadaCard.js';
 import * as Animatable from 'react-native-animatable'
+import api, { buscarJornadasService } from '../../hook/api'
+import Voice from '@react-native-voice/voice';
 
 const data = [
-    { id: '1', nomePCD: 'Joao Da Silva', origem: "Rua Teste, 123", destino: "Rua Teste, 345" }, 
+    { id: '1', nomePCD: 'Joao Da Silva', origem: "Rua Teste, 123", destino: "Rua Teste, 345" },
     { id: '2', nomePCD: 'Gabriel Da Silva', origem: "Rua Teste, 3123112123", destino: "Rua Teste, 365445" },
     { id: '3', nomePCD: 'Felipe Da Silva', origem: "Rua Teste, 14151223", destino: "Rua Teste, 3456456545" },
     { id: '4', nomePCD: 'Roberto Da Silva', origem: "Rua Teste, 125151223", destino: "Rua Teste, 3546456445" },
     { id: '5', nomePCD: 'Ricardo Da Silva', origem: "Rua Teste, 16545623", destino: "Rua Teste, 364645" },
-  
+
     // ...outros itens
 ];
 
 
+class WelcomeAux extends Component {
 
-const WelcomeAux = () => {
+    constructor(props) {
+        super(props);
+        this.state = {
+            jornadas: [],
+            name: '',
+            isListening: false,
+            recognizedText: '',
 
 
-    return (
-        <View style={styles.container}>
-            <StatusBar backgroundColor="white" barStyle="light-content" />
+        }
+    }
 
-            <View style={styles.containerLogo}>
+    async componentDidMount() {
+        console.log("Iniciando")
+        try {
+            const { name } = this.props.route.params;
+            // Coloque seu código assíncrono aqui
+            const response = await buscarJornadasService();
+            console.log(response);
+            this.setState({
+                jornadas: response.data.todasJornadas,
+                name: name
+            })
+            console.log(this.state.jornadas)
+            console.log(this.state.name)
 
-                <Animatable.Image
-                    animation='flipInY'
+        } catch (error) {
+            console.error('Erro:', error);
+        }
+    }
+ 
+    render() {
 
-                    style={{ width: '100%', height: 415, borderRadius: 100 }}
-                    resizemode="contain" />
+        const dadosFiltrados = this.state.jornadas.filter(item => item.ativo === 1);
+        return (
+            <View style={styles.container}>
+                <StatusBar backgroundColor="white" barStyle="light-content" />
 
+                <View style={styles.containerLogo}>
+
+                    <Animatable.Image
+                        animation='flipInY'
+
+                        style={{ width: '100%', height: 415, borderRadius: 100 }}
+                        resizemode="contain" />
+
+                </View>
+
+                <Animatable.View delay={600} animation='fadeInUp' style={styles.containerForm}>
+                    <Text style={styles.usuarioAuxTitle}>Bem vindo, {this.state.name}! </Text>
+                    <Text style={styles.text}>Veja as jornadas</Text>
+                    <FlatList
+                        style={styles.flatList}
+                        data={dadosFiltrados}
+                        keyExtractor={item => item.id}
+                        //descontruindo a lista
+                        renderItem={({ item }) => (
+                            <JornadaCard data={item}
+                            />
+                        )}
+
+                        contentContainerStyle={{ columnGap: 20 }}
+                        horizontal
+                    />
+                </Animatable.View>
             </View>
 
-            <Animatable.View delay={600} animation='fadeInUp' style={styles.containerForm}>
-                <Text style={styles.usuarioAuxTitle}>Usuario Auxiliar</Text>
-                <Text style={styles.text}>Veja as jornadas</Text>
-                <FlatList
-                    data={data}
-                    renderItem={({ item }) => (
-                        <JornadaCard item={item}
-                        />    
-                    )}
-                    keyExtractor={item => item.id}
-                    contentContainerStyle={{ columnGap: 16 }}
-                     horizontal
-                />
-            </Animatable.View>
-        </View>
 
-
-    );
+        );
+    }
 }
 const styles = StyleSheet.create({
     container: {
@@ -59,8 +97,14 @@ const styles = StyleSheet.create({
     containerLogo: {
         flex: 2,
         backgroundColor: 'white',
-        justifyContent: 'center',
+        //justifyContent: 'center',
         alignItems: 'center'
+    },
+    flatList: {
+        //width: 400,
+        //paddingVertical: 12 / 4,
+        //paddingHorizontal: 0,
+        //borderColor: activeJobType === item ? COLORS.secondary : COLORS.gray2,
     },
     containerForm: {
         flex: 3,

@@ -1,50 +1,57 @@
 import React, { Component } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Image } from 'react-native';
-
+import { criarUsuarioService, buscarUsuariosService } from '../../hook/api';
+import { CheckBox } from 'react-native-elements';
 class CadastroScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      nome: '',
-      email: '',
+      name: '',
       senha: '',
+      idade: 0,
+      tipo: '',
       telefone: '',
-      cpf:'',
-      dataNascimento:'',
+      statusGet: false,
     };
   }
+  buscarUsuarios = async () => {
+    try {
+      const response = await buscarUsuariosService();
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
 
-  handleCadastro = () => {
-    const { nome, email, senha, telefone, cpf, dataNascimento } = this.state;
 
-    console.log('Nome:', nome);
-    console.log('Email:', email);
-    console.log('Senha:', senha);
-    console.log('Telefone', telefone);
-    console.log('CPF', cpf);
-    console.log('Data de nascimento', dataNascimento);
+  }
+  handleCadastro = async () => {
+    console.log("djkndkajkds")
+    const { name, senha, tipo, idade, telefone } = this.state;
+    console.log(name, senha, tipo, idade, telefone);
+    criarUsuarioService(name, senha, tipo, idade, telefone)
+      .then((response) => {
+        console.log(response)
+        const status = response.status
+        if (status == 200) {
+          console.log("Deu certo")
+          this.state.statusGet = true
+
+
+
+        }
+      })
+
   }
 
   render() {
+
     return (
       <View style={styles.container}>
-        
-         <Image
-        animation='flipInY'
-        source={require('../../assets/tentativa.png')}
-        style={styles.img}
-        resizemode="contain"/>
-
         <Text style={styles.title}>Faça o seu cadastro</Text>
         <TextInput
           style={styles.input}
           placeholder="Nome"
-          onChangeText={(nome) => this.setState({ nome })}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          onChangeText={(email) => this.setState({ email })}
+          onChangeText={(name) => this.setState({ name })}
         />
         <TextInput
           style={styles.input}
@@ -53,20 +60,26 @@ class CadastroScreen extends Component {
           onChangeText={(senha) => this.setState({ senha })}
         />
         <TextInput
-            style={styles.input}
-            placeholder='Telefone'
-            onChangeText={(telefone) => this.setState({ telefone })}/>
-        <TextInput
-            style={styles.input}
-            placeholder='CPF'
-            onChangeText={(cpf) => this.setState({ cpf })}/>
-        <TextInput
-            style={styles.input}
-            placeholder='Idade'
-            onChangeText={(dataNascimento) => this.setState({ dataNascimento })}/>
+          style={styles.input}
+          placeholder="Idade"
 
-        <TouchableOpacity style={styles.buttonCad}>
-          <Text style={styles.buttonTxt}>Cadastrar</Text>
+          onChangeText={(idade) => this.setState({ idade })}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder='Telefone'
+          onChangeText={(telefone) => this.setState({ telefone })} />
+        <TextInput
+          style={styles.input}
+          placeholder='Tipo'
+          onChangeText={(tipo) => this.setState({ tipo })} />
+
+        <TouchableOpacity style={styles.buttonCad}
+        onPress={() => {
+          this.handleCadastro();
+          this.buscarUsuarios();
+        }}>
+          <Text style={styles.buttonTxt} >Cadastrar</Text>
         </TouchableOpacity>
       </View>
     );
@@ -93,23 +106,23 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingLeft: 8,
   },
-  buttonCad:{
+  buttonCad: {
     backgroundColor: 'black',
-      width:250,
-      height:50,
-      justifyContent: 'center',
-      alignItems: 'center',
-      borderWidth: 1,
-      marginTop:10,
-      borderRadius: 125,
+    width: 250,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    marginTop: 10,
+    borderRadius: 10,
 
   },
-  buttonTxt:{
-    color: 'white', 
-    fontSize: 16,   
+  buttonTxt: {
+    color: 'white',
+    fontSize: 16,
     fontWeight: 'bold',
   },
-  img:{
+  img: {
     width: 100,
     height: 100,
     borderRadius: 10,
@@ -118,7 +131,7 @@ const styles = StyleSheet.create({
     marginTop: -100,
 
   }
- 
+
 });
 
 export default CadastroScreen;

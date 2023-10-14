@@ -23,7 +23,6 @@ class WelcomePCD extends Component {
       mensagemAux: '',
       numero_origem: '',
       numero_destino: '',
-      telefone_pcd: '',
       jornadaAtiva: null,
 
     };
@@ -40,32 +39,21 @@ class WelcomePCD extends Component {
       console.log(this.state.jornadaAtiva)
 
     } catch (error) {
-      console.error('Erro:', error);
+        console.error('Erro:', error);
     }
-  }
+}
   criarJornada = async () => {
-    const { id, telefone } = this.props.route.params;
-    const { cep_origem, cep_destino, desc_aux, desc_pcd, numero_origem, numero_destino } = this.state;
+    const { id } = this.props.route.params;
+    const { cep_origem, cep_destino, dessc_aux, desc_pcd, numero_origem, numero_destino } = this.state;
     console.log("Estou aqui");
     console.log(id);
-    console.log(telefone)
 
-    criarJornadaService(id, telefone, cep_origem, cep_destino, desc_aux, desc_pcd, numero_origem, numero_destino)
-      .then( (response) => {
-        console.log(telefone)
+    criarJornadaService(id, cep_origem, cep_destino, dessc_aux, desc_pcd, numero_origem, numero_destino)
+      .then(function (response) {
         console.log(response);
         const status = response.status;
         if (status === 200) {
           console.log("Deu certo");
-          buscarJornadasByPCDService(id)
-          .then((jornadas) => {
-            this.setState({
-              jornadaAtiva: jornadas
-            });
-          })
-          .catch((error) => {
-            console.error('Erro ao buscar jornadas:', error);
-          });
         }
       }).catch((error) => {
         console.log(error)
@@ -92,7 +80,7 @@ class WelcomePCD extends Component {
               onChangeText={(cep_origem) => this.setState({ cep_origem })}
               placeholder="Qual o CEP de onde esta? "
             />
-            <TextInput
+             <TextInput
               style={styles.input}
               onChangeText={(numero_origem) => this.setState({ numero_origem })}
               placeholder="Qual o numero de onde esta? "
@@ -114,36 +102,41 @@ class WelcomePCD extends Component {
               placeholder="Mensagem para auxiliar"
             />
             <View style={[styles.buttonContainer, { flex: 3 / 3 }]}>
-              {this.state.jornadaAtiva !== undefined ? (
-                <TouchableOpacity
-                  style={styles.buttonVerJornada}
-                  onPress={() => {
-                    this.toggleModal();
-                  }}
-                >
-                  <Text style={styles.buttonTxt}>Ver Jornada</Text>
-                </TouchableOpacity>
-              ) : undefined}
+              <TouchableOpacity
+                style={styles.buttonVerJornada}
+                onPress = {() => {
+                  this.toggleModal()
+    
+                }}
+              >
+                <Text style={styles.buttonTxt}>
+                  Ver Jornada
+                </Text>
+              </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.buttonMandarJornada}
                 onPress={this.criarJornada}
-              >
+               >
                 <Text style={styles.buttonTxt}>
                   Mandar Jornada
                 </Text>
               </TouchableOpacity>
             </View>
-
+           
           </View>
         </Animatable.View>
-        <Modal onBackdropPress={this.toggleModal}
-          isVisible={this.state.isModalVisible}>
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <JornadaCardPCD data={this.state.jornadaAtiva} />
-          </View>
+        <Modal isVisible={this.state.isModalVisible}>
+              <View style={{flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <JornadaCardPCD data={this.state.jornadaAtiva}/>
+                <TouchableOpacity onPress={this.toggleModal}>
+                  <Text style={styles.buttonText}>
+                    Fechar
+                  </Text>
+                </TouchableOpacity>
+              </View>
 
-        </Modal>
+            </Modal>
       </View>
     );
   }
@@ -178,16 +171,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingLeft: 8,
   },
-  closeButton: {
-    backgroundColor: 'red',
-    padding: 10,
-    borderRadius: 10,
-  },
-  buttonFecharModal: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   input: {
     width: '100%',
     height: 40,
@@ -201,32 +184,32 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  buttonVerJornada: {
-    backgroundColor: 'black',
-    width: 100,
-    justifyContent: 'center',
-    height: 50,
-    alignItems: 'center',
-    borderWidth: 1,
-    marginTop: 10,
-    borderRadius: 125,
-  },
-  buttonMandarJornada: {
-    backgroundColor: 'black',
-    width: 120,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    marginTop: 10,
-    borderRadius: 125,
-  },
-  buttonTxt: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+},
+buttonVerJornada: {
+  backgroundColor: 'black',
+  width: 100,
+  justifyContent: 'center',
+  height: 50,
+  alignItems: 'center',
+  borderWidth: 1,
+  marginTop: 10,
+  borderRadius: 125,
+},
+buttonMandarJornada: {
+  backgroundColor: 'black',
+  width: 120,
+  height: 50,
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderWidth: 1,
+  marginTop: 10,
+  borderRadius: 125,
+},
+buttonTxt: {
+  color: 'white',
+  fontSize: 16,
+  fontWeight: 'bold',
+},
 });
 
 export default WelcomePCD;
