@@ -1,24 +1,57 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useEffect, useState } from 'react';
+import { buscarJornadasByPCDService } from '../hook/api';
 
 const JornadaCardPCD = (props) => {
     const navigation = useNavigation(); // Usando useNavigation
+    const [dadosCarregados, setDadosCarregados] = useState(false);
+    const [descAux, setDescAux] = useState('');
+    const [nomeAux, setNomeAux] = useState('');
+    const [telefoneAux, setTelefoneAux] = useState('');
+    const [aceito, setAceito] = useState(0);
 
     const { data } = props;
-    console.log("Estou no modal aqui")
+    console.log("Estou no modal de info Jornada")
     console.log(data.data.jornadaExistente.numero_origem)
+    console.log(data)
+    useEffect(() => {
+        if (!dadosCarregados) {
+            chamarJornada();
+        }
+
+    }, [dadosCarregados]);
+
+    const chamarJornada = async () => {
+        console.log("entrando aqui")
+        const jornada = await buscarJornadasByPCDService(data.data.jornadaExistente.user_id);
+        if (jornada) {
+
+            //cepDestino = jornada.data.jornadaExistente.cep_destino;
+            //numeroDestino = jornada.data.jornadaExistente.numero_destino;
+            setDescAux(jornada.data.jornadaExistente.desc_aux);
+            setNomeAux(jornada.data.jornadaExistente.nome_aux);
+            setTelefoneAux(jornada.data.jornadaExistente.telefone_aux);
+            setAceito(jornada.data.jornadaExistente.aceito);
+            setDadosCarregados(true);
+        }
+
+    }
+    if (!dadosCarregados) {
+        return null;
+    }
 
     return (
         <TouchableOpacity style={styles.container}>
 
             <View style={styles.inputContainer}>
-                <Text style={styles.label}>Número do Destino:</Text>
+                <Text style={styles.label}>CEP do Destino:</Text>
                 <TextInput
                     style={styles.input}
                     value={data.data.jornadaExistente.cep_destino}
                     onChangeText={(text) => {
-                        // Você pode atualizar os dados conforme o usuário digita, se necessário
+
                     }}
                 />
             </View>
@@ -28,7 +61,7 @@ const JornadaCardPCD = (props) => {
                     style={styles.input}
                     value={data.data.jornadaExistente.numero_destino}
                     onChangeText={(text) => {
-                        // Você pode atualizar os dados conforme o usuário digita, se necessário
+
                     }}
                 />
             </View>
@@ -38,16 +71,37 @@ const JornadaCardPCD = (props) => {
 
             <View style={styles.inputContainer}>
                 <Text style={styles.label}>Sua mensagem:</Text>
-                <TextInput
-                    style={styles.input}
-                    value={data.data.jornadaExistente.desc_pcd}
-                    onChangeText={(text) => {
-                        // Você pode atualizar os dados conforme o usuário digita, se necessário
-                    }}
-                />
+
+
+            </View>
+            <TextInput
+                style={styles.input}
+                value={"-" + data.data.jornadaExistente.desc_pcd}
+                onChangeText={(text) => {
+
+                }}
+            />
+            <View style={styles.separator} />
+
+            <View style={styles.inputContainer}>
+                <Text style={styles.labelAuxiliar}>Mensagem do Auxiliar:</Text>
+
             </View>
             <View style={styles.inputContainer}>
-                <Text style={[styles.label, styles.importantLabel]}>Aceito?: {data.data.jornadaExistente.aceito === 1 ? 'Sim' : 'Não'}</Text>
+                <Text style={styles.label} numberOfLines={3}>
+                    {descAux}
+                </Text>
+            </View>
+
+            <View style={styles.inputContainer}>
+                <Text style={styles.label}>Nome do Auxiliar:-{nomeAux}</Text>
+            </View>
+            <View style={styles.inputContainer}>
+                <Text style={styles.label}>Telefone do Auxiliar: -{telefoneAux}</Text>
+
+            </View>
+            <View style={styles.inputContainer}>
+                <Text style={[styles.label, styles.importantLabel]}>Aceito?: {aceito === 1 ? 'Sim' : 'Não'}</Text>
             </View>
         </TouchableOpacity>
     );
@@ -59,7 +113,7 @@ const styles = StyleSheet.create({
     container: {
         width: 400,
         padding: 24,
-        height: 300,
+        height: 450,
         borderRadius: 16,
         borderColor: 'black',
         backgroundColor: 'white',
@@ -72,7 +126,13 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
     },
     input: {
-        fontSize: 16,
+        fontSize: 20,
+    },
+    separator: {
+        height: 1,
+        backgroundColor: 'green',
+        marginTop: 10,
+        marginBottom: 10,
     },
     usuarioPCDNome: ({
         fontSize: 12,
@@ -84,17 +144,21 @@ const styles = StyleSheet.create({
 
     },
     label: {
-        fontSize: 16
+        fontSize: 20
+    },
+    labelAuxiliar: {
+        fontSize: 20
     },
     importantLabel: {
-        fontSize: 18, 
-        borderColor: 'red', 
-        borderWidth: 2, 
-        padding: 4, 
+        fontSize: 18,
+        borderColor: 'red',
+        borderWidth: 2,
+        padding: 4,
     },
     inputContainer: {
         flexDirection: 'row',
-        alignItems: 'center', 
+        alignItems: 'center',
+        padding: 5
     },
     aceitarButton: {
         width: 70,

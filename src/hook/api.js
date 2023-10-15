@@ -1,5 +1,7 @@
 
 import axios from "axios";
+import key from '../config/index.json'
+
 URL = "http://192.168.15.42:3000/"
 const api = axios.create({
     baseURL: this.URL
@@ -8,6 +10,7 @@ const loginRetorno = {
     tipoUsuario: '',
     status: ''
 }
+
 
 export function loginUsuarioService(name, senha) {
     return axios.post(this.URL + 'login', {
@@ -21,17 +24,60 @@ export function loginUsuarioService(name, senha) {
         throw error; // Propaga o erro para quem chama a função
     });
 }
-
-export function buscarJornadasService() {
-    return axios.get(this.URL + 'jornadas')
-}
-
-export function buscarJornadasByPCDService(id) {
-    return axios.get(this.URL + 'usuario/' + id + '/jornada/ativas').then((response) => {
+export function aceitarJornadaService(id_usuario, id_jornada, aceito, desc_aux, name_aux, telefone ){
+    console.log("Estou no service de aceitar")
+    console.log(id_usuario, id_jornada, aceito, desc_aux, name_aux, telefone )
+    console.log(this.URL + 'usuario/' + id_usuario + '/jornada/' + id_jornada + '/aceitar')
+    return axios.put(this.URL + 'usuario/' + id_usuario + '/jornada/' + id_jornada + '/aceitar', {
+        
+        id_usuario: id_usuario,
+        id_jornada: id_jornada,
+        aceito: aceito,
+        desc_aux: desc_aux,
+        nome_aux: name_aux,
+        telefone_aux: telefone
+    }).then((response) => {
+        if(response.status == 200){
+            alert('Aceitou a jornada');
+        }
         return response;
     }).catch(function (error) {
         console.log(error);
-        alert('Comece criando uma jornada');
+        alert('Aceitar jornada falhou');
+        throw error; 
+    });
+}
+export function buscarJornadasService() {
+    return axios.get(this.URL + 'jornadas')
+}
+export function terminarJornadaService(id_usuario, id_jornada, aceito, ativo){
+    console.log(this.URL + 'usuario/' + id_usuario + '/jornada/' + id_jornada + '/terminar')
+    return axios.put(this.URL + 'usuario/' + id_usuario + '/jornada/' + id_jornada + '/terminar', {
+        aceito: aceito,
+        ativo: ativo
+    }).then((response) => {
+        if(response.status === 200){
+            alert('Jornada terminada com sucesso')
+        }
+    }).catch(function (error) {
+        console.log(error);
+        alert('Terminar jornada falhou');
+        throw error; 
+    });
+}
+export function buscarJornadasByPCDService(id) {
+    return axios.get(this.URL + 'usuario/' + id + '/jornada/ativas').then((response) => {
+        if(response == undefined){
+            alert('Vc esta sem jornadas')
+        }
+        return response;
+       
+    }).catch(function (error) {
+        console.log(error);
+        setTimeout(()=>{
+            alert('Crie uma jornada');
+        }, 1200)
+       
 
     });
 }
@@ -60,26 +106,25 @@ export function criarJornadaService(id, telefone, cep_origem, cep_destino, desc_
         throw error; // Propaga o erro para quem chama a função
     });
 }
-export async function getCoordinatesFromCEPAndNumeroService (cep, numero) {
-    const address = `${cep} ${numero}`; // Combine o CEP e o número em um único endereço
+export async function getInfoCEPService(cep) {
+    console.log(cep)
     try {
-      const response = await axios.get(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${address}`
-      );
-      if (response.status === 200 && response.data.length > 0) {
-        const firstResult = response.data[0];
-        const latitude = parseFloat(firstResult.lat);
-        const longitude = parseFloat(firstResult.lon);
-        console.log(response)
-        return { latitude, longitude };
-      }
-      return null;
+      const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+      return response;
     } catch (error) {
-      console.error('Erro ao obter coordenadas:', error);
-      return null;
+      console.error('Erro ao obter dados pelo CEP:', error);
     }
-};
-  
+  }
+  export async function getLatElongGoogleService(numero, rua, cidade, estado, cep) {
+    const chave = key.googleApi
+    try {
+      const response = await axios
+      .get(`https://maps.googleapis.com/maps/api/geocode/json?address=${numero}+,+${rua},+${cidade}+${estado}+${cep}&key=${chave}`);
+      return response;
+    } catch (error) {
+      console.error('Erro ao obter dados pelo CEP:', error);
+    }
+  }
 export function criarUsuarioService(name, senha, tipo, idade, telefone) {
     console.log(this.URL + '/usuario')
     return axios.post(this.URL + 'usuario', {

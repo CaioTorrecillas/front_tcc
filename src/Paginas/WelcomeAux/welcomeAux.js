@@ -1,19 +1,9 @@
 import React, { Component, useEffect, useState } from 'react';
-import { View, Text, StatusBar, StyleSheet, Image, TextInput, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StatusBar, StyleSheet, Image, TextInput, TouchableOpacity, Button, FlatList } from 'react-native';
 import JornadaCard from '../../common/jornadaCard.js';
 import * as Animatable from 'react-native-animatable'
 import api, { buscarJornadasService } from '../../hook/api'
 import Voice from '@react-native-voice/voice';
-
-const data = [
-    { id: '1', nomePCD: 'Joao Da Silva', origem: "Rua Teste, 123", destino: "Rua Teste, 345" },
-    { id: '2', nomePCD: 'Gabriel Da Silva', origem: "Rua Teste, 3123112123", destino: "Rua Teste, 365445" },
-    { id: '3', nomePCD: 'Felipe Da Silva', origem: "Rua Teste, 14151223", destino: "Rua Teste, 3456456545" },
-    { id: '4', nomePCD: 'Roberto Da Silva', origem: "Rua Teste, 125151223", destino: "Rua Teste, 3546456445" },
-    { id: '5', nomePCD: 'Ricardo Da Silva', origem: "Rua Teste, 16545623", destino: "Rua Teste, 364645" },
-
-    // ...outros itens
-];
 
 
 class WelcomeAux extends Component {
@@ -32,24 +22,30 @@ class WelcomeAux extends Component {
 
     async componentDidMount() {
         console.log("Iniciando")
+        this.fetchData();
+    }
+    async fetchData() {
         try {
-            const { name } = this.props.route.params;
-            // Coloque seu código assíncrono aqui
+            const { name, telefone } = this.props.route.params;
             const response = await buscarJornadasService();
-            console.log(response);
             this.setState({
                 jornadas: response.data.todasJornadas,
-                name: name
-            })
+                name: name,
+            });
+            console.log("metodo refresh")
             console.log(this.state.jornadas)
             console.log(this.state.name)
-
         } catch (error) {
             console.error('Erro:', error);
         }
     }
- 
+    refreshScreen = () => {
+        // Chame o método fetchData novamente para atualizar os dados
+       
+        this.fetchData();
+    }
     render() {
+
 
         const dadosFiltrados = this.state.jornadas.filter(item => item.ativo === 1);
         return (
@@ -67,15 +63,23 @@ class WelcomeAux extends Component {
                 </View>
 
                 <Animatable.View delay={600} animation='fadeInUp' style={styles.containerForm}>
+                   
                     <Text style={styles.usuarioAuxTitle}>Bem vindo, {this.state.name}! </Text>
-                    <Text style={styles.text}>Veja as jornadas</Text>
+
+                    <Text style={styles.text}> Veja as jornadas disponiveis.</Text>
+                    <Text style={styles.textDica}>  Após aceitar uma jornada clique em refresh! </Text>
+                    <View style={styles.refreshContainer}>
+                        <TouchableOpacity style={styles.refreshButton} onPress={this.refreshScreen}>
+                            <Text style={styles.refreshButtonText}>Refresh</Text>
+                        </TouchableOpacity>
+                    </View>
                     <FlatList
                         style={styles.flatList}
                         data={dadosFiltrados}
                         keyExtractor={item => item.id}
                         //descontruindo a lista
                         renderItem={({ item }) => (
-                            <JornadaCard data={item}
+                            <JornadaCard data={item} telefone={this.props.route.params.telefone} name_aux={this.state.name}
                             />
                         )}
 
@@ -86,16 +90,18 @@ class WelcomeAux extends Component {
             </View>
 
 
+
         );
     }
 }
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: 'white'
+        flex: 2,
+        backgroundColor: 'white',
+        marginTop: -20,
     },
     containerLogo: {
-        flex: 2,
+        flex: 1,
         backgroundColor: 'white',
         //justifyContent: 'center',
         alignItems: 'center'
@@ -106,11 +112,34 @@ const styles = StyleSheet.create({
         //paddingHorizontal: 0,
         //borderColor: activeJobType === item ? COLORS.secondary : COLORS.gray2,
     },
+    refreshButton: {
+        backgroundColor: '#4169E2', // Cor azul clara
+        borderRadius: 10, // Borda arredondada
+        padding: 1,
+        width: 80,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    refreshContainer: {
+        marginBottom: 10,
+    },
+    textDica: { 
+        fontSize: 10,
+        color: 'black',
+        alignItems: 'center',
+        alignSelf: 'center',
+        marginTop: 100,
+        bottom: '20%',
+    },
+    refreshButtonText: {
+        color: 'white',
+        fontSize: 16,
+    },
     containerForm: {
         flex: 3,
         backgroundColor: '#FFF',
         paddingStart: '10%',
-        paddingEnd: '10%'
+        paddingEnd: '10%',
     },
     tittle: {
         fontSize: 20,
@@ -126,8 +155,8 @@ const styles = StyleSheet.create({
         color: 'black',
         alignItems: 'center',
         alignSelf: 'center',
-        marginTop: 220,
-        bottom: '15%',
+        marginTop: 100,
+        bottom: '10%',
     },
     button1: {
         position: 'absolute',

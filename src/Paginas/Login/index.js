@@ -34,7 +34,8 @@ const LoginScreen = () => {
                     if (tipo == 'PCD' || tipo == 'Pcd') {
                         navigation.navigate('WelcomePCD', {id, name, telefone});
                     } else if (tipo == 'AUX' || tipo == 'Aux') {
-                        navigation.navigate('WelcomeAux', {name});
+                        navigation.navigate('WelcomeAux', {name,  telefone});
+                        console.log(telefone)
                     }
                     alert('Logado com sucesso');
                 }
