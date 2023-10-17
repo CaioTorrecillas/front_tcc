@@ -1,4 +1,4 @@
-import { React, useState } from 'react';
+import { React, useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { useNavigation } from '@react-navigation/native';
@@ -6,110 +6,237 @@ import { useAuth } from '../../Autenticator/Autenticar'; // Importe useAuth
 import * as Speech from 'expo-speech'
 const windowHeight = Dimensions.get('window').height;
 import api, { loginUsuarioService } from '../../hook/api';
-import Voice from '@react-native-voice/voice'
+import { TouchableWithoutFeedback } from 'react-native'
+import { registerIndieID } from 'native-notify';
+
 
 const LoginScreen = () => {
-    const usuarios = "usuarios"
+    const textoBemvindo = "Bem vindo a tela de Loguin! Se você não tem conta, clique no botão registrar-se! No lado direito inferior da tela. O botão de loguin fica do canto inferior esquerdo."
     const [endpoint, setEndpoint] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [text, setText] = useState('Bem vindo Usuario. Caso voce tiver deficiencia visual esse aplicativo pode te ajudar');
-    const [spokenText, setSpokenText] = useState('');
+    const [spokenText, setSpokenText] = useState(true);
 
-   
+
     const navigation = useNavigation();
     const fazerLogin = async () => {
-        loginUsuarioService(username, password)
+        loginUsuarioService(username, password, spokenText)
             .then(function (response) {
                 const status = response.status
                 const tipo = response.data.usuarioUnico.tipo
                 const id = response.data.usuarioUnico.id;
                 const name = response.data.usuarioUnico.name
                 const telefone = response.data.usuarioUnico.telefone
+
                 console.log(response.data.usuarioUnico.telefone)
                 console.log(id)
                 console.log(status)
                 console.log(tipo)
                 if (status == 200) {
-                    if (tipo == 'PCD' || tipo == 'Pcd') {
-                        navigation.navigate('WelcomePCD', {id, name, telefone});
-                    } else if (tipo == 'AUX' || tipo == 'Aux') {
-                        navigation.navigate('WelcomeAux', {name,  telefone});
+                    if (tipo == 'PCD'.toLowerCase() || tipo == 'PCD'.toUpperCase() ||tipo == 'Pcd' ) {
+                        const logIndiePush = registerIndieID(id.toString(), 13503, 'K5gt3U83l0l5Vseg9sq0pJ');
+                        console.log('cadastrado?:' + logIndiePush)
+                        navigation.navigate('WelcomePCD', { id, name, telefone });
+                    } else if (tipo == 'AUX'.toLowerCase() ||tipo == 'AUX'.toUpperCase()||tipo == 'Aux' ) {
+                        navigation.navigate('WelcomeAux', { name, telefone });
                         console.log(telefone)
                     }
-                    alert('Logado com sucesso');
+
                 }
-               
+
             })
             .catch(function (error) {
                 console.log(error);
             });
-                 
-            
-    }
-    /*
-    useEffect(() => {
-        api.get('List').then(({data}) => {
-            setAlgumacoisa(data)
-        })
 
-    })
-    */
-    const buscarUsuarios = async () => {
-        try {
-            //resposta da api
-            setEndpoint("/usuarios")
-            const response = await api.get(`${endpoint}`)
-            console.log(response.data)
-        } catch (error) {
-            console.log(error)
+
+    }
+
+    useEffect(() => {
+        if (spokenText) {
+            Speech.speak(textoBemvindo, {
+                language: 'pt-BR',
+                rate: 0.9,
+            })
         }
+    }, [])
+    useEffect(() => {
+
+    }, [navigation])
+    function notificarUsuario() {
+        if (spokenText) {
+            const clicandoNaTela = "Voce não está clicando em nada"
+            Speech.speak(clicandoNaTela, {
+                language: 'pt-BR',
+                rate: 0.9,
+            })
+        }
+    }
+    function notificarCampoSenhaInfo(text) {
+        if (spokenText) {
+            if (text === undefined || text.length === 0) {
+                Speech.speak('Campo Senha vazio', {
+                    language: 'pt-BR',
+                    rate: 0.9,
+                });
+            } else {
+                const lastCharacter = text[text.length - 1];
+                Speech.speak(lastCharacter, {
+                    language: 'pt-BR',
+                    rate: 0.9,
+                });
+
+            }
+        }
+    }
+    function notificarCampoNameInfo(text) {
+        if (spokenText) {
+            if (text === undefined || text.length === 0) {
+                Speech.speak('Campo Nome vazio', {
+                    language: 'pt-BR',
+                    rate: 0.9,
+                });
+            } else {
+                const lastCharacter = text[text.length - 1];
+                Speech.speak(lastCharacter, {
+                    language: 'pt-BR',
+                    rate: 0.9,
+                });
+
+            }
+        }
+    }
+    function notificarUsuarioNome() {
+
+        if (spokenText) {
+            //const clicandoNaTela = 
+            Speech.speak("Campo nome.", {
+                language: 'pt-BR',
+                rate: 0.9,
+            })
+        }
+
+
+
+    }
+    function notificarUsuarioSenha() {
+
+        if (spokenText) {
+            //const clicandoNaTela = 
+            Speech.speak("Campo senha.", {
+                language: 'pt-BR',
+                rate: 0.9,
+            })
+        }
+
+
+
+
+    }
+    function notificarBotaoLogin() {
+
+        if (spokenText) {
+            //const clicandoNaTela = 
+            Speech.speak("Botão de login.", {
+                language: 'pt-BR',
+                rate: 0.9,
+            })
+        }
+
+
+    }
+    function notificarBotaoCadastro() {
+
+        if (spokenText) {
+            //const clicandoNaTela = 
+            Speech.speak("Botão de Cadastro. Indo para cadastro", {
+                language: 'pt-BR',
+                rate: 0.9,
+            })
+
+        }
+
+    }
+    function desativarAtivarVoz() {
+        console.log(spokenText)
+        if (spokenText) {
+            Speech.speak('Botão para ativar ou desativar voz. Clique aqui para ativar novamente.', {
+                language: 'pt-BR',
+            })
+            setSpokenText(false)
+            console.log(spokenText)
+
+        } else {
+            setSpokenText(true)
+            Speech.speak('Botão para ativar ou desativar voz. Ativando voz', {
+                language: 'pt-BR',
+            })
+        }
+
+
     }
     /*function speak(){
         Speech.speak(text, {
             language: 'pt-BR'
         })
     }*/
-    function gravarVoz (){
-       Voice.start('pr-BR');
-
-    }
     return (
-        <View style={styles.container}>
+        <TouchableWithoutFeedback onPress={notificarUsuario}>
+            <View style={styles.container}>
 
-            <Animatable.View
-                delay={100}
-                animation='fadeInUp'
-                style={[styles.containerForm, { height: windowHeight / 2  }]}>
-                <Text style={styles.title1}>Faça o seu Login</Text>
-                <TextInput
-                    style={styles.txt}
-                    placeholder="Nome de Usuário"
-                    onChangeText={(username) => setUsername(username)}
-                />
-                <TextInput
-                    style={styles.txt}
-                    placeholder="Senha"
-                    secureTextEntry={true}
-                    onChangeText={(password) => setPassword(password)}
-                />
-                <View style={[styles.buttonContainer, { flex: 3 / 3 }]}>
-                    <TouchableOpacity
-                        style={styles.buttonEntrar}
-                        onPress={() => {
-                            fazerLogin();
+
+                <Animatable.View
+                    delay={100}
+                    animation='fadeInUp'
+                    style={[styles.containerForm, { height: windowHeight / 2 }]}>
+                    <Text style={styles.title1}>Faça o seu Login - Alfa</Text>
+                    <TextInput
+                        style={styles.txt}
+                        placeholder="Nome de Usuário"
+                        onChangeText={(username) => {
+                            setUsername(username)
+                            notificarCampoNameInfo(username)
+                        }}
+                        onFocus={notificarUsuarioNome}
+                    />
+                    <TextInput
+                        style={styles.txt}
+                        placeholder="Senha"
+                        onChangeText={(password) => {
+                            setPassword(password)
+                            notificarCampoSenhaInfo(password)
+                        }}
+                        onFocus={notificarUsuarioSenha}
+
+
+                    />
+                    <View style={[styles.buttonContainer, { flex: 3 / 3 }]}>
+                        <TouchableOpacity
+                            style={styles.buttonEntrar}
+                            onPress={() => {
+                                fazerLogin();
+                                notificarBotaoLogin;
+                            }}>
+                            <Text style={styles.buttonTxt}>Entrar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[styles.buttonVoz, { backgroundColor: spokenText ? 'green' : 'red' }]}
+                            onPress={() => {
+                                desativarAtivarVoz();
+                            }}>
+                            <Text style={styles.buttonTxt}>Voz</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.buttonCadastro} onPress={() => {
+                            navigation.navigate('CadastroScreen', {spokenText});
+                            this.handleLogin;
+                            notificarBotaoCadastro();
                         }}>
-                        <Text style={styles.buttonTxt}>Entrar</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.buttonCadastro} onPress={() => {
-                        navigation.navigate('CadastroScreen');
-                        this.handleLogin;
-                    }}>
-                        <Text style={styles.buttonTxt}>Registrar-se</Text>
-                    </TouchableOpacity>
-                </View>
-            </Animatable.View>
-        </View>
+                            <Text style={styles.buttonTxt}>Registrar-se</Text>
+                        </TouchableOpacity>
+                    </View>
+                </Animatable.View>
+            </View>
+        </TouchableWithoutFeedback>
     );
 }
 
@@ -137,9 +264,9 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'black',
         borderRadius: 10,
-        padding: 10, 
+        padding: 10,
         marginTop: 15,
-      },
+    },
     buttonCadastro: {
         backgroundColor: 'black',
         width: 120,
@@ -162,6 +289,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
+        marginTop: 10,
+        borderRadius: 125,
+    },
+    buttonVoz: {
+        backgroundColor: 'green',
+        width: 100,
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
         marginTop: 10,
         borderRadius: 125,
     },

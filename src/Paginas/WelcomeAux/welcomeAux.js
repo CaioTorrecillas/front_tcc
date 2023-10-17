@@ -3,7 +3,7 @@ import { View, Text, StatusBar, StyleSheet, Image, TextInput, TouchableOpacity, 
 import JornadaCard from '../../common/jornadaCard.js';
 import * as Animatable from 'react-native-animatable'
 import api, { buscarJornadasService } from '../../hook/api'
-import Voice from '@react-native-voice/voice';
+
 
 
 class WelcomeAux extends Component {

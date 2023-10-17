@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Image, StyleSheet, TextInput } from 'reac
 import { useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
 import { buscarJornadasByPCDService } from '../hook/api';
-
+import * as Speech from 'expo-speech'
 const JornadaCardPCD = (props) => {
     const navigation = useNavigation(); // Usando useNavigation
     const [dadosCarregados, setDadosCarregados] = useState(false);
@@ -17,11 +17,17 @@ const JornadaCardPCD = (props) => {
     console.log(data.data.jornadaExistente.numero_origem)
     console.log(data)
     useEffect(() => {
+    
         if (!dadosCarregados) {
             chamarJornada();
         }
 
     }, [dadosCarregados]);
+    useEffect(()=>{
+        Speech.speak('Aqui você pode ter informações da sua jornada ativa')
+        console.log(aceito)
+        return
+    }, [])
 
     const chamarJornada = async () => {
         console.log("entrando aqui")
@@ -35,11 +41,53 @@ const JornadaCardPCD = (props) => {
             setTelefoneAux(jornada.data.jornadaExistente.telefone_aux);
             setAceito(jornada.data.jornadaExistente.aceito);
             setDadosCarregados(true);
+            if(jornada.data.jornadaExistente.aceito == 0){
+                Speech.speak('Sua jornada ainda não foi aceita', {
+                    language: 'pt-BR',
+                    rate: 1.1,
+                })
+            }else if (jornada.data.jornadaExistente.aceito == 1){
+                Speech.speak('Sua jornada foi aceita por ' +jornada.data.jornadaExistente.nome_aux+'. Lendo mensagem do auxiliar', {
+                    language: 'pt-BR',
+                    rate: 1.1,
+                })
+                Speech.speak('Mensagem do auxiliar, '+jornada.data.jornadaExistente.desc_aux, {
+                    language: 'pt-BR',
+                    rate: 1.1,
+                })
+                Speech.speak('Telefone do auxiliar', {
+                    language: 'pt-BR',
+                    rate: 1.1,
+                })
+                speakPhoneNumber(jornada.data.jornadaExistente.telefone_aux)
+               
+            }
         }
 
     }
+    function speakPhoneNumber(phoneNumber) {
+        if (phoneNumber) {
+          const numberDigits = phoneNumber.split('');
+          const speechDelay = 500; // Atraso em milissegundos entre os dígitos
+      
+          function speakDigit(index) {
+            if (index < numberDigits.length) {
+              const digit = numberDigits[index];
+              Speech.speak(digit, {
+                language: 'pt-BR',
+                rate: 1.1,
+              });
+      
+              setTimeout(() => speakDigit(index + 1), speechDelay);
+            }
+          }
+      
+          speakDigit(0); // Inicie a leitura do primeiro dígito
+        }
+      }
     if (!dadosCarregados) {
         return null;
+
     }
 
     return (
