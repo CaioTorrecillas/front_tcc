@@ -7,7 +7,7 @@ import registerNNPushToken from 'native-notify';
 //const Stack = createNativeStackNavigator();
 
 function App() {
-  registerNNPushToken(13503, 'K5gt3U83l0l5Vseg9sq0pJ');
+  registerNNPushToken(13643, 'o4Mk8DoNS2Ley06Y336k7S');
   return (
     <AuthProvider>
       <NavigationContainer>

@@ -1,8 +1,8 @@
 {
-  "expo": { "runtimeVersion": 
-  {
-    "policy": "appVersion"
-  },
+  "expo": {
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "name": "TccTeste",
     "displayName": "TccTeste",
     "slug": "projeto-tcc",
@@ -10,43 +10,29 @@
     "platforms": [
       "android"
     ],
-  
     "ios": {
       "bundleIdentifier": "com.suaempresa.seuapp"
     },
     "plugins": [
       [
-        "onesignal-expo-plugin",
+        "expo-build-properties",
         {
-          "mode": "development"
+          "android": {
+            "usesCleartextTraffic": true
+          }
         }
       ]
     ],
     "extra": {
-      "oneSignalAppId": "042c7fac-20eb-4e80-a9c6-9ea241d523e4",
+     
       "eas": {
         "build": {
-          "experimental": {
-            "ios": {
-              "appExtensions": [
-                {
-                  "targetName": "OneSignalNotificationServiceExtension",
-                  "bundleIdentifier": "com.suaempresa.seuapp.OneSignalNotificationServiceExtension",
-                  "entitlements": {
-                    "com.apple.security.application-groups": [
-                      "group.com.suaempresa.seuapp.onesignal"
-                    ]
-                  }
-                }
-              ]
-            }
-          }
         },
         "projectId": "4c992fe5-d783-4738-a61d-d5286b4cde9e"
       }
     },
     "android": {
-      "versionCode": 1,
+      "versionCode": 5,
       "package": "com.tcc.app",
       "googleServicesFile": "./google-services.json"
     },
