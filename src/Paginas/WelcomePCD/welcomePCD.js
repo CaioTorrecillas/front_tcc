@@ -3,11 +3,27 @@ import { View, Text, StatusBar, StyleSheet, TextInput, TouchableOpacity, Touchab
 import { useRoute } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
 import api, { criarJornadaService } from '../../hook/api';
-import { buscarJornadasByPCDService } from '../../hook/api';
+import { buscarJornadasByPCDService, pegaTokenService } from '../../hook/api';
 import Modal from 'react-native-modal';
 import JornadaCardPCD from '../../common/jornardaCardPCD';
 import * as Notifications from 'expo-notifications';
 import * as Speech from 'expo-speech'
+import { Platform } from 'react-native';
+//const Stack = createNativeStackNavigator();
+import * as Device from 'expo-device';
+import Constants from 'expo-constants';
+
+
+
+
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 class WelcomePCD extends Component {
   state = {
@@ -17,6 +33,7 @@ class WelcomePCD extends Component {
     super(props);
 
     this.state = {
+      //user_id: null,
       cep_origem: null,
       cep_destino: null,
       desc_pcd: null,
@@ -25,6 +42,7 @@ class WelcomePCD extends Component {
       numero_destino: null,
       telefone_pcd: '',
       jornadaAtiva: null,
+      token: null,
 
     };
   }
@@ -37,10 +55,20 @@ class WelcomePCD extends Component {
     })
     Speech.speak('Os campos estão no meio da tela. O botão mandar Jornada está no canto inferior direito da tela.')
     Speech.speak('O botão Aceitar Jornada irá aparecer assim que você mandar uma jornada, ele está no canto inferior esquerdo')
+
+
     try {
       const { id } = this.props.route.params;
+      //this.setState({user_id: id})
+      const token = await this.registerForPushNotificationsAsync();
+      if(token){
+        console.log(token, id)
+        pegaTokenService(token, id)
+      }
       console.log(id)
-      this.notificacaoPermissao()
+      //pegaTokenService(id, token)
+
+
       const jornadas = await buscarJornadasByPCDService(id);
       this.setState({
         jornadaAtiva: jornadas
@@ -66,6 +94,42 @@ class WelcomePCD extends Component {
 
     }
   }
+  
+  registerForPushNotificationsAsync = async () => {
+    let token;
+
+    if (Platform.OS === 'android') {
+      Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+
+    if (Device.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        alert('Failed to get push token for push notification!');
+        return;
+      }
+      token = await Notifications.getExpoPushTokenAsync({
+        projectId: Constants.expoConfig.extra.eas.projectId,
+      });
+      console.log(token.data);
+      //setExpoPushToken(token)
+    } else {
+      alert('Must use physical device for Push Notifications');
+    }
+
+    return token.data;
+  }
+
   componentWillUnmount = () => {
 
     Speech.speak('Saindo da tela de bem vindo. Indo para Login', {

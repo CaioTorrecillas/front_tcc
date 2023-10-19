@@ -2,8 +2,8 @@
 import axios from "axios";
 import key from '../config/index.json'
 import * as Speech from 'expo-speech'
-URL = "http://35.198.61.144/"
-//URL = "http://192.168.15.42:3000/"
+//URL = "http://35.198.61.144/"
+URL = "http://192.168.15.42:3000/"
 const api = axios.create({
     baseURL: this.URL
 })
@@ -39,6 +39,28 @@ export function loginUsuarioService(name, senha, voz) {
 
 
         throw error; // Propaga o erro para quem chama a função
+    });
+}
+export function pegaTokenService(token, id) {
+    return axios.put(this.URL + 'token' + '/' + id, {
+        token: token
+    }).then((response ) => {
+        console.log(response)
+        if(response.status == 400){
+            console.log("Ja tem TOken")
+        }
+    })
+
+}
+export function notificarPCDService(id) {
+    return axios.get(this.URL + 'notificar' + '/' + id)
+    .then((response ) => {
+        console.log(response)
+    }).catch(function (error) {
+        console.log(error);
+        // alert(error)
+
+        alert('Impossivel notificar o usuário') // Propaga o erro para quem chama a função
     });
 }
 export function aceitarJornadaService(id_usuario, id_jornada, aceito, desc_aux, name_aux, telefone) {

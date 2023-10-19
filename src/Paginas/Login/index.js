@@ -16,7 +16,7 @@ const LoginScreen = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [spokenText, setSpokenText] = useState(true);
-
+  
 
     const navigation = useNavigation();
     const fazerLogin = async () => {

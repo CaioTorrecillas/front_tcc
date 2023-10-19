@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import api, { aceitarJornadaService, buscarJornadasService, mandarNotificacaoService } from '../hook/api'
-import axios from "axios";
+import api, { aceitarJornadaService, buscarJornadasService, notificarPCDService } from '../hook/api'
+
 
 const AceitarCard = (props) => {
 
@@ -35,18 +35,13 @@ const AceitarCard = (props) => {
         console.log(id_usuario, id_jornada, aceitar, message, name_aux, telefone)
         if(aceitar == 1){
             await buscarJornadasService();
-            axios.post(`https://app.nativenotify.com/api/indie/notification`, {
-                subID: `${id_usuario.toString()}`,
-                appId: 13503,
-                appToken: 'K5gt3U83l0l5Vseg9sq0pJ',
-                title: `SUA JORNADA POR ${name_aux}` ,
-                message: 'SUA JORNADA FOI ACEITA POR UM AUXILIAR'
-           });
+    
             await aceitarJornadaService(id_usuario, id_jornada, aceitar, message, name_aux, telefone)
             .then((response) => {
                 console.log(response)
                
-              })
+            })
+            await notificarPCDService(id_usuario);
         }
        
     };
