@@ -3,7 +3,7 @@ import { View, Text, StatusBar, StyleSheet, TextInput, TouchableOpacity, Touchab
 import { useRoute } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
 import api, { criarJornadaService } from '../../hook/api';
-import { buscarJornadasByPCDService, pegaTokenService } from '../../hook/api';
+import { buscarJornadasByPCDService, pegaTokenService, chamaUsuarioByIDService, buscarUsuariosService } from '../../hook/api';
 import Modal from 'react-native-modal';
 import JornadaCardPCD from '../../common/jornardaCardPCD';
 import * as Notifications from 'expo-notifications';
@@ -26,6 +26,7 @@ Notifications.setNotificationHandler({
 });
 
 class WelcomePCD extends Component {
+
   state = {
     isModalVisible: false,
   };
@@ -43,23 +44,34 @@ class WelcomePCD extends Component {
       telefone_pcd: '',
       jornadaAtiva: null,
       token: null,
+      idEditar: null
 
     };
   }
   async componentDidMount() {
+    buscarUsuariosService()
     const { name } = this.props.route.params;
     console.log("Iniciando...")
     Speech.speak('Bem vindo, ' + name + '.' + '! Voce pode criar uma jornada, digitando o CÉP de origem e destino e o número de origem e destino', {
       language: 'pt-BR',
       rate: 0.8
     })
-    Speech.speak('Os campos estão no meio da tela. O botão mandar Jornada está no canto inferior direito da tela.')
-    Speech.speak('O botão Aceitar Jornada irá aparecer assim que você mandar uma jornada, ele está no canto inferior esquerdo')
-
+    Speech.speak('Os campos estão no meio da tela. O botão mandar Jornada está no canto inferior direito da tela.', {
+      language: 'pt-BR',
+      rate: 0.9
+    })
+    Speech.speak('O botão Aceitar Jornada irá aparecer assim que você mandar uma jornada, ele está no canto inferior esquerdo', {
+      language: 'pt-BR',
+      rate: 0.9
+    })
+    Speech.speak('O botão para editar seu Perfil esta no canto superior direito.', {
+      language: 'pt-BR',
+      rate: 0.9
+    })
 
     try {
       const { id } = this.props.route.params;
-      //this.setState({user_id: id})
+      this.pegaId(id);
       const token = await this.registerForPushNotificationsAsync();
       if(token){
         console.log(token, id)
@@ -138,6 +150,10 @@ class WelcomePCD extends Component {
     })
     this.setState({ criado: false })
 
+  }
+
+  pegaId(id){
+    this.setState({idEditar: id})
   }
   notificarCampoCEPOrigemInfo(text) {
     if (text === undefined || text.length === 0) {
@@ -309,18 +325,24 @@ class WelcomePCD extends Component {
   };
 
 
-
   render() {
+    const { navigation } = this.props;
     return (
       <TouchableWithoutFeedback onPress={this.notificarUsuario}>
         <View style={styles.container}>
 
           <StatusBar backgroundColor="white" barStyle="light-content" />
-
           <Animatable.View delay={600} animation='fadeInUp' style={styles.containerForm}>
+          <TouchableOpacity
+                  style={styles.buttonPerfil}
+                  onPress={() => navigation.navigate("InfoPCD",  { id: this.state.idEditar })}
+                >
+                  <Text style={styles.buttonTxt}>
+                    Ver Perfil
+                  </Text>
+              </TouchableOpacity>
             <View style={styles.containerForm}>
               <Text style={styles.blind}>Bem vindo, {this.props.route.params.name}!</Text>
-
               <TextInput
                 style={styles.input}
                 keyboardType="numeric"
@@ -431,7 +453,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
   },
   buttonContainerLeft: {
-    flexDirection: 'row', // Isso alinha os botões "Ver Jornada" à esquerda
+    flexDirection: 'row', 
   },
   inputMensagem: {
     width: '100%',
@@ -471,14 +493,26 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
     width: 100,
     justifyContent: 'center',
-    height: 50,
+    height: 200,
     alignItems: 'center',
     borderWidth: 1,
     marginTop: 10,
-    borderRadius: 125,
+    borderRadius: 10,
 
   },
   buttonMandarJornada: {
+    backgroundColor: 'black',
+    width: 120,
+    height: 200,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    alignSelf: 'flex-end',
+    borderRadius: 10,
+
+
+  },
+  buttonPerfil: {
     backgroundColor: 'black',
     width: 120,
     height: 50,

@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../Autenticator/Autenticar'; // Importe useAuth
 import * as Speech from 'expo-speech'
 const windowHeight = Dimensions.get('window').height;
-import api, { loginUsuarioService } from '../../hook/api';
+import api, { loginUsuarioService, buscarUsuariosService } from '../../hook/api';
 import { TouchableWithoutFeedback } from 'react-native'
 import { registerIndieID } from 'native-notify';
 
@@ -34,11 +34,9 @@ const LoginScreen = () => {
                 console.log(tipo)
                 if (status == 200) {
                     if (tipo == 'PCD'.toLowerCase() || tipo == 'PCD'.toUpperCase() ||tipo == 'Pcd' ) {
-                        const logIndiePush = registerIndieID(id.toString(), 13503, 'K5gt3U83l0l5Vseg9sq0pJ');
-                        console.log('cadastrado?:' + logIndiePush)
                         navigation.navigate('WelcomePCD', { id, name, telefone });
                     } else if (tipo == 'AUX'.toLowerCase() ||tipo == 'AUX'.toUpperCase()||tipo == 'Aux' ) {
-                        navigation.navigate('WelcomeAux', { name, telefone });
+                        navigation.navigate('WelcomeAux', {id, name, telefone });
                         console.log(telefone)
                     }
 
@@ -53,6 +51,7 @@ const LoginScreen = () => {
     }
 
     useEffect(() => {
+        buscarUsuariosService()
         if (spokenText) {
             Speech.speak(textoBemvindo, {
                 language: 'pt-BR',
@@ -270,27 +269,28 @@ const styles = StyleSheet.create({
     buttonCadastro: {
         backgroundColor: 'black',
         width: 120,
-        height: 50,
+        height: 200,
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
         marginTop: 10,
-        borderRadius: 125,
+        borderRadius: 10,
     },
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        marginBottom: -140,
     },
     buttonEntrar: {
         backgroundColor: 'black',
         width: 100,
-        height: 50,
+        height: 200,
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
         marginTop: 10,
-        borderRadius: 125,
+        borderRadius: 10,
     },
     buttonVoz: {
         backgroundColor: 'green',

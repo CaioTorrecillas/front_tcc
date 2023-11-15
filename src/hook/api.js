@@ -63,6 +63,27 @@ export function notificarPCDService(id) {
         alert('Impossivel notificar o usuário') // Propaga o erro para quem chama a função
     });
 }
+export function chamaUsuarioByIDService(id){
+    return axios.get(this.URL + 'usuario/' + id).then((response) => {
+        return response;
+    }).catch(function (error){
+        console.log(error);
+    });
+}
+
+export function editarUsuarioService(id, name, senha, idade, telefone){
+    return axios.put(this.URL + 'usuario-editar/' + id, {
+        name: name,
+        senha: senha,
+        idade: idade,
+        telefone: telefone,
+
+    }).then((response) => {
+        return response;
+    }).catch(function (error){
+        console.log(error);
+    });
+}
 export function aceitarJornadaService(id_usuario, id_jornada, aceito, desc_aux, name_aux, telefone) {
     console.log("Estou no service de aceitar")
     console.log(id_usuario, id_jornada, aceito, desc_aux, name_aux, telefone)
@@ -119,6 +140,9 @@ export function buscarJornadasByPCDService(id) {
 export function buscarUsuariosService() {
     return axios.get(this.URL + 'usuarios')
 }
+export function deleteUsuarioService(id) {
+    return axios.delete(this.URL + 'usuarios/'+ id )
+}
 export function mandarNotificacaoService(id, nome_aux) {
     console.log("Notificando usuario" + id)
 
@@ -126,7 +150,7 @@ export function mandarNotificacaoService(id, nome_aux) {
 }
 
 export function criarJornadaService(id, telefone, cep_origem, cep_destino, desc_aux, desc_pcd, numero_origem, numero_destino) {
-    console.log(this.URL + '/usuario/' + id, '/jornada')
+    console.log(this.URL + 'usuario/' + id, '/jornada')
     console.log(cep_origem);
     return axios.post(this.URL + 'usuario/' + id + '/jornada', {
         cep_origem: cep_origem,
@@ -164,7 +188,7 @@ export async function getLatElongGoogleService(numero, rua, cidade, estado, cep)
     }
 }
 export function criarUsuarioService(name, senha, tipo, idade, telefone, voz) {
-    console.log(this.URL + '/usuario')
+    console.log(this.URL + 'usuario')
     return axios.post(this.URL + 'usuario', {
         name: name,
         senha: senha,

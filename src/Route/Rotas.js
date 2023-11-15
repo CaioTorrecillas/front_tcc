@@ -8,6 +8,8 @@ import WelcomePCD from "../Paginas/WelcomePCD/welcomePCD";
 import JornadaCard from '../common/jornadaCard'
 import WelcomeAux from "../Paginas/WelcomeAux/welcomeAux";
 import MapaAux from "../Paginas/MapaAux/mapaAux";
+import InfoPCD from "../Paginas/Infos/infoPCD";
+import InfoAUX from "../Paginas/Infos/infoAUX"
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +22,8 @@ function App() {
             <Stack.Screen name="WelcomePCD" component={WelcomePCD} />
             <Stack.Screen name="WelcomeAux" component={WelcomeAux} />
             <Stack.Screen name="JornadaCard" component={JornadaCard}/>
+            <Stack.Screen name="InfoAUX" component={InfoAUX}/>
+            <Stack.Screen name="InfoPCD" component={InfoPCD}/>
             <Stack.Screen name="MapaAux" component={MapaAux}/>
         </Stack.Navigator>
 

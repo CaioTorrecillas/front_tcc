@@ -15,7 +15,7 @@ class WelcomeAux extends Component {
             name: '',
             isListening: false,
             recognizedText: '',
-
+            idEditar: null,
 
         }
     }
@@ -26,11 +26,13 @@ class WelcomeAux extends Component {
     }
     async fetchData() {
         try {
-            const { name, telefone } = this.props.route.params;
+            const { id, name, telefone } = this.props.route.params;
+            console.log(id)
             const response = await buscarJornadasService();
             this.setState({
                 jornadas: response.data.todasJornadas,
                 name: name,
+                idEditar: id
             });
             console.log("metodo refresh")
             console.log(this.state.jornadas)
@@ -41,17 +43,36 @@ class WelcomeAux extends Component {
     }
     refreshScreen = () => {
         // Chame o método fetchData novamente para atualizar os dados
-       
+
         this.fetchData();
     }
     render() {
 
+        const { navigation } = this.props;
+        console.log("noemeekqweowq")
+        //const dadosFiltradosJorandasAtivas = dadosFiltradosJorandasAtivas.filter(item => item.ativo === 1);
+        console.log(this.state.name)
+        const dadosFiltradosJornadasAtivas = this.state.jornadas.filter((item) => 
 
-        const dadosFiltrados = this.state.jornadas.filter(item => item.ativo === 1);
+            item.nome_aux === this.state.name && item.ativo === 1 || (item.nome_aux === "" && item.ativo === 1) || (item.nome_aux === null  && item.ativo === 1 ) || (item.nome_aux === undefined && item.ativo === 1)
+        );
+        console.log("Jornadas filtradas")
+        console.log(dadosFiltradosJornadasAtivas)
         return (
             <View style={styles.container}>
-                <StatusBar backgroundColor="white" barStyle="light-content" />
 
+                <StatusBar backgroundColor="white" barStyle="light-content" />
+                <View style={styles.buttonPerfilContainer}>
+
+                <TouchableOpacity
+                        style={styles.buttonPerfil}
+                        onPress={() => navigation.navigate("InfoAUX", { id: this.state.idEditar })}
+                    >
+                        <Text style={styles.buttonText}>
+                            Perfil
+                        </Text>
+                    </TouchableOpacity>
+                </View>
                 <View style={styles.containerLogo}>
 
                     <Animatable.Image
@@ -63,19 +84,29 @@ class WelcomeAux extends Component {
                 </View>
 
                 <Animatable.View delay={600} animation='fadeInUp' style={styles.containerForm}>
+
                    
+
+
+
                     <Text style={styles.usuarioAuxTitle}>Bem vindo, {this.state.name}! </Text>
+
+      
+               
 
                     <Text style={styles.text}> Veja as jornadas disponiveis.</Text>
                     <Text style={styles.textDica}>  Após aceitar uma jornada clique em refresh! </Text>
+           
+
                     <View style={styles.refreshContainer}>
                         <TouchableOpacity style={styles.refreshButton} onPress={this.refreshScreen}>
                             <Text style={styles.refreshButtonText}>Refresh</Text>
                         </TouchableOpacity>
                     </View>
+     
                     <FlatList
                         style={styles.flatList}
-                        data={dadosFiltrados}
+                        data={dadosFiltradosJornadasAtivas}
                         keyExtractor={item => item.id}
                         //descontruindo a lista
                         renderItem={({ item }) => (
@@ -100,6 +131,13 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         marginTop: -20,
     },
+    buttonPerfilContainer: {
+        //position: 'absolute',
+        top: 20, // Coloca o botão no topo da tela
+        width: '100%',
+        height: 100,
+        alignItems: 'center',
+    },
     containerLogo: {
         flex: 1,
         backgroundColor: 'white',
@@ -123,7 +161,7 @@ const styles = StyleSheet.create({
     refreshContainer: {
         marginBottom: 10,
     },
-    textDica: { 
+    textDica: {
         fontSize: 10,
         color: 'black',
         alignItems: 'center',
@@ -131,12 +169,20 @@ const styles = StyleSheet.create({
         marginTop: 100,
         bottom: '20%',
     },
+    buttonPerfil: {
+        backgroundColor: 'black',
+        borderRadius: 50,
+        width: 70,
+        //marginLeft: 200,
+        alignItems: 'center',
+        //justifyContent: 'left'
+    },
     refreshButtonText: {
         color: 'white',
         fontSize: 16,
     },
     containerForm: {
-        flex: 3,
+        flex: 5,
         backgroundColor: '#FFF',
         paddingStart: '10%',
         paddingEnd: '10%',
@@ -182,7 +228,8 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         fontSize: 18,
-        color: '#FFF'
+        color: '#FFF',
+        justifyContent: 'center'
     },
     usuarioAuxTitle: {
         fontSize: 30,
