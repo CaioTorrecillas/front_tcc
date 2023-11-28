@@ -148,6 +148,9 @@ export function mandarNotificacaoService(id, nome_aux) {
 
 
 }
+export function deleteJornadaService(idUser, idJornada) {
+    return axios.delete(this.URL + 'usuario/'+ idUser + '/jornada/' + idJornada)
+}
 
 export function criarJornadaService(id, telefone, cep_origem, cep_destino, desc_aux, desc_pcd, numero_origem, numero_destino) {
     console.log(this.URL + 'usuario/' + id, '/jornada')

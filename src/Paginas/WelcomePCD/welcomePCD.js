@@ -3,7 +3,7 @@ import { View, Text, StatusBar, StyleSheet, TextInput, TouchableOpacity, Touchab
 import { useRoute } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
 import api, { criarJornadaService } from '../../hook/api';
-import { buscarJornadasByPCDService, pegaTokenService, chamaUsuarioByIDService, buscarUsuariosService } from '../../hook/api';
+import { buscarJornadasByPCDService, pegaTokenService, chamaUsuarioByIDService, buscarUsuariosService, deleteJornadaService } from '../../hook/api';
 import Modal from 'react-native-modal';
 import JornadaCardPCD from '../../common/jornardaCardPCD';
 import * as Notifications from 'expo-notifications';
@@ -29,6 +29,7 @@ class WelcomePCD extends Component {
 
   state = {
     isModalVisible: false,
+    isModalDeleteVisible: false
   };
   constructor(props) {
     super(props);
@@ -54,17 +55,21 @@ class WelcomePCD extends Component {
     console.log("Iniciando...")
     Speech.speak('Bem vindo, ' + name + '.' + '! Voce pode criar uma jornada, digitando o CÉP de origem e destino e o número de origem e destino', {
       language: 'pt-BR',
-      rate: 0.8
+      rate: 0.9
     })
     Speech.speak('Os campos estão no meio da tela. O botão mandar Jornada está no canto inferior direito da tela.', {
       language: 'pt-BR',
       rate: 0.9
     })
-    Speech.speak('O botão Aceitar Jornada irá aparecer assim que você mandar uma jornada, ele está no canto inferior esquerdo', {
+    Speech.speak('O botão Ver Jornada irá aparecer assim que você mandar uma jornada, ele está no canto inferior esquerdo', {
       language: 'pt-BR',
       rate: 0.9
     })
     Speech.speak('O botão para editar seu Perfil esta no canto superior direito.', {
+      language: 'pt-BR',
+      rate: 0.9
+    })
+    Speech.speak('O botão para apagar sua joranda, se tiver, está no canto superior esquerdo.', {
       language: 'pt-BR',
       rate: 0.9
     })
@@ -300,6 +305,29 @@ class WelcomePCD extends Component {
 
   }
 
+  deletarJornada = async () => {
+    this.setState({ isModalDeleteVisible: !this.state.isModalDeleteVisible });
+    console.log(this.state.idEditar, this.state.jornadaAtiva.data.jornadaExistente.id)
+    deleteJornadaService(this.state.idEditar, this.state.jornadaAtiva.data.jornadaExistente.id).then((data) => {
+      console.log(data)
+      if(data.status == 200){
+        Speech.speak('Jornada Deletada', {
+          language: 'pr-BR',
+          rate: 1.0
+        })
+      } 
+    
+        
+    }).then(()=>{
+      this.setState({
+      jornadaAtiva: undefined
+    })
+   })
+
+     
+  
+  } 
+
   async notificacaoPermissao() {
     /*console.log("notifi")
     let token;
@@ -323,7 +351,26 @@ class WelcomePCD extends Component {
 
 
   };
+  deleteModal = () => {
+    this.setState({ isModalDeleteVisible: !this.state.isModalDeleteVisible });
+    console.log(this.state.isModalDeleteVisible)
+    if (this.state.isModalDeleteVisible) {
+      Speech.speak('Desistindo de apagar jornada', {
+        language: 'pr-BR',
+        rate: 1.0
+      })
 
+    } else {
+
+      Speech.speak('Clicando em botão deletar jornada. Se quiser apagar a jornada, clique no meio da tela', {
+        language: 'pr-BR',
+        rate: 1.0
+      })
+
+    }
+
+
+  };
 
   render() {
     const { navigation } = this.props;
@@ -333,6 +380,28 @@ class WelcomePCD extends Component {
 
           <StatusBar backgroundColor="white" barStyle="light-content" />
           <Animatable.View delay={600} animation='fadeInUp' style={styles.containerForm}>
+          <View style={styles.buttonContainerHead}>
+          {this.state.jornadaAtiva !== undefined && (
+          <TouchableOpacity
+                  style={styles.deletarJornada}
+                  onPress={this.deleteModal}
+                >
+                  <Text style={styles.buttonTxt}>
+                    Deletar Jornada
+                  </Text>
+          </TouchableOpacity>
+          )}
+          <Modal onBackdropPress={this.deleteModal}
+            isVisible={this.state.isModalDeleteVisible}>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+              <TouchableOpacity style={styles.buttonDel} onPress={() => {
+                this.deletarJornada()
+              }} >
+                <Text style={styles.buttonTxt}>Deletar Jornada</Text>
+              </TouchableOpacity>
+            </View>
+
+          </Modal>
           <TouchableOpacity
                   style={styles.buttonPerfil}
                   onPress={() => navigation.navigate("InfoPCD",  { id: this.state.idEditar })}
@@ -341,6 +410,7 @@ class WelcomePCD extends Component {
                     Ver Perfil
                   </Text>
               </TouchableOpacity>
+          </View>
             <View style={styles.containerForm}>
               <Text style={styles.blind}>Bem vindo, {this.props.route.params.name}!</Text>
               <TextInput
@@ -426,7 +496,9 @@ class WelcomePCD extends Component {
 
           </Modal>
         </View>
+        
       </TouchableWithoutFeedback>
+      
     );
   }
 }
@@ -454,6 +526,16 @@ const styles = StyleSheet.create({
   },
   buttonContainerLeft: {
     flexDirection: 'row', 
+  },
+  buttonDel: {
+    backgroundColor: 'red',
+    width: 300,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    marginTop: 110,
+    borderRadius: 125,
   },
   inputMensagem: {
     width: '100%',
@@ -488,7 +570,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 100,
   },
+  buttonContainerHead: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
 
+  },
   buttonVerJornada: {
     backgroundColor: 'black',
     width: 100,
@@ -521,6 +608,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignSelf: 'flex-end',
     borderRadius: 125,
+
+
+  },
+  deletarJornada: {
+    backgroundColor: 'red',
+    width: 120,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    alignSelf: 'flex-end',
+    borderRadius: 125,
+
 
 
   },

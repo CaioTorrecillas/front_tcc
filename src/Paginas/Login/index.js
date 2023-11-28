@@ -7,7 +7,7 @@ import * as Speech from 'expo-speech'
 const windowHeight = Dimensions.get('window').height;
 import api, { loginUsuarioService, buscarUsuariosService } from '../../hook/api';
 import { TouchableWithoutFeedback } from 'react-native'
-import { registerIndieID } from 'native-notify';
+
 
 
 const LoginScreen = () => {
@@ -188,7 +188,7 @@ const LoginScreen = () => {
                     delay={100}
                     animation='fadeInUp'
                     style={[styles.containerForm, { height: windowHeight / 2 }]}>
-                    <Text style={styles.title1}>Faça o seu Login - Alfa</Text>
+                    <Text style={styles.title1}>Faça o seu Login</Text>
                     <TextInput
                         style={styles.txt}
                         placeholder="Nome de Usuário"
